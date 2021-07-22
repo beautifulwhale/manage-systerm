@@ -25,7 +25,7 @@
         <el-form-item prop="password">
           <el-input
             v-model="Loginmodel.password"
-            prefix-icon="iconfont icon-a-mimasuoji"
+            prefix-icon="iconfont icon-mimasuo"
             type="password"
           ></el-input>
         </el-form-item>
@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
@@ -47,6 +48,7 @@ export default {
         username: "admin",
         password: "123456"
       },
+      //登录的校验规则
       LoginFormRules: {
         username: [
           { required: true, message: "请输入登录名称", trigger: "blur" },
@@ -67,16 +69,33 @@ export default {
     loginIn() {
       this.$refs.LoginFormRefs.validate(async valid => {
         if (!valid) return;
-        const { data: result } = await this.$http
-          .post("login", this.Loginmodel);
-           if (result.meta.status !== 200) 
-           return this.$message.error('登陆失败')
-           this.$message.success('登陆成功')
-          //1.将登陆成功的token保存到客户端sessionStorage
-          window.sessionStorage.setItem('token',result.data.token);
-          //2.通过编程式导航跳转到后台主页,路由地址是/home
-          this.$router.push('/home')
-         
+        const { data: result } = await this.$http.post(
+          "login",
+          this.Loginmodel
+        );
+        console.log(result)
+        if (result.meta.status !== 200) return this.$message.error("登陆失败");
+        this.$message.success("登陆成功");
+
+        // const result = await axios({
+        //   method: "POST",
+        //   url: "/login",
+        //   data: this.Loginmodel
+        // }).then(
+        //   res => {
+        //     console.log(res);
+        //     return this.$message.success("登陆成功！！！");
+        //   },
+        //   error => {
+        //     return this.$message.error("登陆失败");
+        //     console.log(error);
+        //   }
+        // );
+       
+        //1.将登陆成功的token保存到客户端sessionStorage
+          window.sessionStorage.setItem("token", result.data.token);
+        //2.通过编程式导航跳转到后台主页,路由地址是/home
+        this.$router.push("/home");
       });
     }
   }
