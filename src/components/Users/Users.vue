@@ -49,7 +49,6 @@
         </el-table-column>
         <el-table-column label="操作" width="190px">
           <template v-slot:default="scope">
-            <!-- v-slot:default="scope" 修改时可能用得到 -->
             <!-- 编辑 -->
             <el-button
               type="primary"
@@ -338,14 +337,13 @@ export default {
         if (!valid) return;
         const res = await axios({
           method: "PUT",
-          params: {
+          data: {
             email: this.editUserForm.email,
             mobile: this.editUserForm.mobile
           },
           url: "users/" + this.editUserForm.id
         }).then(
           res => {
-            console.log(res);
             this.getUserList();
             this.editUserDialogVisible = false;
             this.$message.success("更新用户状态成功");
