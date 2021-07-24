@@ -49,6 +49,7 @@
         </el-table-column>
         <el-table-column label="操作" width="190px">
           <template v-slot:default="scope">
+            <!-- {{scope.row}} -->
             <!-- 编辑 -->
             <el-button
               type="primary"
@@ -74,6 +75,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
+                @click="setRoles(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -146,6 +148,33 @@
       <span slot="footer">
         <el-button @click="editUserDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="editUser">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 分配角色对话框 -->
+    <el-dialog
+      title="提示"
+      :visible.sync="distributionRolesVisible"
+      width="50%"
+    >
+      <div>
+        <p>当前的用户: {{ userInfo.username }}</p>
+        <p>当前的角色: {{ userInfo.role_name }}</p>
+        <p>
+          分配新角色:
+          <el-select v-model="setRolesId" placeholder="请选择">
+            <el-option
+              v-for="item in rolesList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="distributionRolesVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRolesInfo">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -231,7 +260,14 @@ export default {
           { required: true, message: "请输入手机号", trigger: "blur" },
           { validator: checkMobile, trigger: "blur" }
         ]
-      }
+      },
+      distributionRolesVisible: false,
+      //需要被分配角色的用户信息
+      userInfo: {},
+      //选择框的角色下拉菜单
+      rolesList: [],
+      //已选中的角色ID值
+      setRolesId: ""
     };
   },
   created() {
@@ -380,6 +416,40 @@ export default {
             message: "已取消删除"
           });
         });
+    },
+    //获取分配角色对话框信息
+    setRoles(userInfo) {
+      this.userInfo = userInfo;
+      const res = axios.get("roles").then(
+        res => {
+          this.rolesList = res.data.data;
+        },
+        error => {
+          console.log(error);
+        }
+      );
+      this.distributionRolesVisible = true;
+    },
+    //点击按钮 分配新角色
+    saveRolesInfo() {
+      if (!this.setRolesId) return this.$message.error("请分配角色~");
+      const res = axios({
+        method: "put",
+        url: `users/${this.userInfo.id}/role`,
+        data: {
+          rid: this.setRolesId
+        }
+      }).then(
+        res => {
+          console.log(res);
+          this.$message.success("分配角色成功");
+          this.getUserList();
+          this.distributionRolesVisible = false;
+        },
+        error => {
+          return this.$message.error(error);
+        }
+      );
     }
   }
 };

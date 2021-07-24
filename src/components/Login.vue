@@ -73,7 +73,6 @@ export default {
           "login",
           this.Loginmodel
         );
-        console.log(result)
         if (result.meta.status !== 200) return this.$message.error("登陆失败");
         this.$message.success("登陆成功");
 

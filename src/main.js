@@ -23,10 +23,14 @@ import {
   Tooltip,
   Pagination,
   Dialog,
-  MessageBox
+  MessageBox,
+  Select,
+  Option
 } from "element-ui";
 Vue.use(Button);
 Vue.use(Form);
+Vue.use(Select);
+Vue.use(Option);
 Vue.use(Dialog);
 Vue.use(FormItem);
 Vue.use(Input);

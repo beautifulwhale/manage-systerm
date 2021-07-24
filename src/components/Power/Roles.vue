@@ -72,7 +72,6 @@
                 </el-row>
               </el-col>
             </el-row>
-            <pre>{{ scope.row }}</pre>
           </template>
         </el-table-column>
         <el-table-column type="index" label="#"></el-table-column>
@@ -95,7 +94,11 @@
               >删除</el-button
             >
             <el-tooltip effect="dark" content="分配权限" placement="top-start">
-              <el-button size="mini" type="warning" icon="el-icon-setting"
+              <el-button
+                size="mini"
+                type="warning"
+                icon="el-icon-setting"
+                @click="allotRight(scope.row)"
                 >分配权限</el-button
               >
             </el-tooltip>
@@ -155,6 +158,28 @@
         <el-button type="primary" @click="editRoles">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 分配权限对话框 -->
+    <el-dialog
+      title="分配权限"
+      :visible.sync="setRightDialogVisible"
+      width="50%"
+      @close="resetRightClosed"
+    >
+      <el-tree
+        :data="rightList"
+        :props="rightProps"
+        node-key="id"
+        ref="treeRef"
+        :default-checked-keys="defKeysArr"
+        show-checkbox
+        default-expand-all
+      ></el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRightDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="setAllotRight">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -195,7 +220,18 @@ export default {
           { required: true, message: "请输入角色描述", trigger: "blur" },
           { min: 3, max: 10, message: "长度在 5 到 15 个字符", trigger: "blur" }
         ]
-      }
+      },
+      setRightDialogVisible: false,
+      //权限列表
+      rightList: [],
+      rightProps: {
+        children: "children",
+        label: "authName"
+      },
+      //默认勾选的节点的 key 的数组
+      defKeysArr: [],
+      //角色ID
+      roleId:''
     };
   },
   created() {
@@ -331,6 +367,63 @@ export default {
             message: "已取消删除"
           });
         });
+    },
+    //分配权限对话框的显示
+    allotRight(role) {
+      //后台获取权限树
+      const res = axios.get("rights/tree").then(
+        res => {
+          // console.log(res);
+          this.rightList = res.data.data;
+          this.roleId = role.id;
+        },
+        error => {
+          console.log(error);
+        }
+      );
+      this.getDefKeysArr(role, this.defKeysArr);
+      this.setRightDialogVisible = true;
+    },
+    //获取默认勾选key值得数组
+    getDefKeysArr(node, arr) {
+      //选择递归得方式
+      //如果没有字节点直接把ID传到数组中
+      if (!node.children) {
+        return arr.push(node.id);
+      }
+      //如果有字节点进行遍历
+      node.children.forEach(item => {
+        this.getDefKeysArr(item, arr);
+      });
+    },
+    //当关闭对话框时重置权限，以免存在上一个得
+    resetRightClosed() {
+      this.defKeysArr = [];
+    },
+    //点击为角色分配权限
+    setAllotRight() {
+      //把所有选中半选中的权限的ID找到
+      const keyId = [
+        ...this.$refs.treeRef.getCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys()
+      ];
+      const keyIdStr = keyId.join(",");
+      const res = axios({
+        method: "post",
+        url:`roles/${this.roleId}/rights`,
+        data:{
+          rids:keyIdStr
+        }
+      }).then(
+        res => {
+          this.$message.success("添加分配权限成功");
+          this.getRolesList();
+          this.setRightDialogVisible = false;
+        },
+        error => {
+          console.log(error);
+        }
+      );
     }
   }
 };
