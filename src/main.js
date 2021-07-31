@@ -6,7 +6,9 @@ import router from "./router";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import "./assets/css/global.css";
-
+import TreeTable from 'vue-table-with-tree-grid'
+ 
+Vue.component("tree-table", TreeTable)
 import {
   Button,
   Form,
@@ -25,12 +27,14 @@ import {
   Dialog,
   MessageBox,
   Select,
-  Option
+  Option,
+  Cascader
 } from "element-ui";
 Vue.use(Button);
 Vue.use(Form);
 Vue.use(Select);
 Vue.use(Option);
+Vue.use(Cascader);
 Vue.use(Dialog);
 Vue.use(FormItem);
 Vue.use(Input);

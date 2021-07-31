@@ -6,6 +6,8 @@ import Welcome from '../components/Welcome.vue'
 import Users from '@/components/Users/Users'
 import Rights from '@/components/Power/Rights'
 import Roles from '@/components/Power/Roles'
+import Cate from '@/components/Goods/Cate'
+import Params from '@/components/Goods/Params'
 Vue.use(Router)
 
 export default new Router({
@@ -26,7 +28,10 @@ export default new Router({
         {path:'/welcome',component:Welcome},
         {path:'/users',component:Users},
         {path:'/rights',component:Rights},
-        {path:'/roles',component:Roles}
+        {path:'/roles',component:Roles},
+        {path:'/categories',component:Cate},
+        {path:'/params',component:Params}
+
       ]
     },
   ]
