@@ -73,7 +73,6 @@
                   @click="showInput(scope.row)"
                   >+ New Tag</el-button
                 >
-                <pre>{{ scope.row }}</pre>
               </template>
             </el-table-column>
             <el-table-column type="index"></el-table-column>
@@ -183,7 +182,6 @@
         <el-button type="primary" @click="editParams">确 定</el-button>
       </span>
     </el-dialog>
-    <!-- 删除的对话框 -->
   </div>
 </template>
 
